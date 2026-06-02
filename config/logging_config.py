@@ -56,42 +56,98 @@ class JSONFormatter(logging.Formatter):
         return json.dumps(log_dict, default=str, ensure_ascii=False)
 
 
+class StructuredLogger:
+    """
+    Thin wrapper around :class:`logging.Logger` that accepts keyword arguments
+    on every log-level method and routes them through ``extra`` so that
+    :class:`JSONFormatter` can attach them to the emitted JSON record.
+
+    Usage::
+
+        logger = get_logger(__name__)
+        logger.info("Connected", host="localhost", port=5432)
+    """
+
+    def __init__(self, inner: logging.Logger) -> None:
+        self._inner = inner
+
+    # ------------------------------------------------------------------ #
+    # Delegate attribute access (e.g. .name, .level, .handlers) to inner  #
+    # ------------------------------------------------------------------ #
+    def __getattr__(self, item: str):
+        return getattr(self._inner, item)
+
+    # ------------------------------------------------------------------ #
+    # Log-level helpers                                                    #
+    # ------------------------------------------------------------------ #
+
+    def _log(self, level: int, msg: str, *args, **kwargs) -> None:
+        extra = kwargs.pop("extra", {})
+        extra.update(kwargs)          # absorb structlog-style key=value pairs
+        exc_info = kwargs.pop("exc_info", False) if "exc_info" in extra else False
+        self._inner.log(level, msg, *args, extra=extra, exc_info=exc_info)
+
+    def debug(self, msg: str, *args, **kwargs) -> None:
+        self._log(logging.DEBUG, msg, *args, **kwargs)
+
+    def info(self, msg: str, *args, **kwargs) -> None:
+        self._log(logging.INFO, msg, *args, **kwargs)
+
+    def warning(self, msg: str, *args, **kwargs) -> None:
+        self._log(logging.WARNING, msg, *args, **kwargs)
+
+    def error(self, msg: str, *args, **kwargs) -> None:
+        self._log(logging.ERROR, msg, *args, **kwargs)
+
+    def critical(self, msg: str, *args, **kwargs) -> None:
+        self._log(logging.CRITICAL, msg, *args, **kwargs)
+
+    def exception(self, msg: str, *args, **kwargs) -> None:
+        kwargs["exc_info"] = True
+        self._log(logging.ERROR, msg, *args, **kwargs)
+
+    def isEnabledFor(self, level: int) -> bool:
+        return self._inner.isEnabledFor(level)
+
+
 def get_logger(
     name: str,
     log_file: Optional[str] = None,
     level: Optional[str] = None,
-) -> logging.Logger:
+) -> StructuredLogger:
     """
-    Return a named logger with JSON formatting to stdout and optionally a file.
+    Return a :class:`StructuredLogger` with JSON formatting to stdout and
+    optionally to a rotating file.
 
     Args:
-        name:     Logger name, typically __name__ of the calling module.
-        log_file: Optional path to a rotating log file.
-        level:    Override the default log level from settings.
+        name:     Logger name, typically ``__name__`` of the calling module.
+        log_file: Optional absolute path to a log file.
+        level:    Override the default log level from ``AppConfig``.
     """
-    logger = logging.getLogger(name)
+    inner = logging.getLogger(name)
 
-    # Avoid adding duplicate handlers in Lambda re-use scenarios
-    if logger.handlers:
-        return logger
+    # Avoid adding duplicate handlers in Lambda re-use / hot-reload scenarios
+    if not inner.handlers:
+        effective_level = getattr(
+            logging, (level or app_cfg.log_level).upper(), logging.INFO
+        )
+        inner.setLevel(effective_level)
 
-    effective_level = getattr(logging, (level or app_cfg.log_level).upper(), logging.INFO)
-    logger.setLevel(effective_level)
+        formatter = JSONFormatter()
 
-    formatter = JSONFormatter()
+        # stdout handler
+        stdout_handler = logging.StreamHandler(sys.stdout)
+        stdout_handler.setFormatter(formatter)
+        inner.addHandler(stdout_handler)
 
-    # --- stdout handler ---
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    stdout_handler.setFormatter(formatter)
-    logger.addHandler(stdout_handler)
+        # optional file handler
+        if log_file:
+            log_path = Path(log_file)
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            file_handler = logging.FileHandler(log_path, encoding="utf-8")
+            file_handler.setFormatter(formatter)
+            inner.addHandler(file_handler)
 
-    # --- file handler (optional) ---
-    if log_file:
-        log_path = Path(log_file)
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-        file_handler = logging.FileHandler(log_path, encoding="utf-8")
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        inner.propagate = False
 
-    logger.propagate = False
-    return logger
+    return StructuredLogger(inner)
