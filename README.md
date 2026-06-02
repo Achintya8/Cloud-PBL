@@ -113,13 +113,21 @@ areca-price-system/
 |--------------------|-------------------------------------------|
 | Python             | 3.10 or 3.11 recommended                  |
 | PostgreSQL         | 15.x (local install **or** Docker)        |
-| pip                | Latest                                    |
+| uv                 | Latest (`curl -LsSf https://astral.sh/uv/install.sh | sh`) |
 | AWS CLI            | Only needed for cloud deployment          |
 | Docker (optional)  | Easiest way to run PostgreSQL locally     |
 
 ---
 
 ## Local Development Setup
+
+### 0. Install uv
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+> `uv` replaces `pip` and `python -m venv` for all dependency and environment management in this project.
 
 ### 1. Clone the repository
 
@@ -131,7 +139,7 @@ cd areca-price-system
 ### 2. Create and activate a virtual environment
 
 ```bash
-python -m venv .venv
+uv venv
 source .venv/bin/activate        # Linux / macOS
 # .venv\Scripts\activate         # Windows
 ```
@@ -139,7 +147,7 @@ source .venv/bin/activate        # Linux / macOS
 ### 3. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 ### 4. Configure environment variables
@@ -406,9 +414,10 @@ In production, ETL runs daily at 06:00 UTC via an EventBridge rule automatically
 ## Contributing
 
 1. Fork the repository and create a feature branch.
-2. Follow PEP 8 and use type hints throughout.
-3. Add or update docstrings for any changed modules.
-4. Test locally with `python scripts/run_local.py` before opening a PR.
+2. Install dependencies with `uv pip install -r requirements.txt`.
+3. Follow PEP 8 and use type hints throughout.
+4. Add or update docstrings for any changed modules.
+5. Test locally with `python scripts/run_local.py` before opening a PR.
 
 ---
 

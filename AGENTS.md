@@ -318,10 +318,10 @@ Standard library → third-party → local, separated by blank lines. No wildcar
 
 ```bash
 # 1. Clone + virtualenv
-python -m venv .venv && source .venv/bin/activate
+uv venv && source .venv/bin/activate
 
 # 2. Install deps
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 
 # 3. Configure env
 cp .env.example .env   # then edit .env

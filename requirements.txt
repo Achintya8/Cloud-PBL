@@ -1,7 +1,7 @@
 # ============================================================
 # requirements.txt
 # Areca Nut Price Prediction System — Python Dependencies
-# Pinned for reproducibility. Run: pip install -r requirements.txt
+# Pinned for reproducibility. Run: uv pip install -r requirements.txt
 # ============================================================
 
 # --- Web / API ---

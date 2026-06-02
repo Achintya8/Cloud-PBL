@@ -416,7 +416,7 @@ apt-get upgrade -y
 
 # --- Install dependencies ---
 apt-get install -y \
-    python3.11 python3.11-venv python3-pip \
+    python3.11 python3.11-venv \
     nginx postgresql-client \
     wget curl git unzip \
     apt-transport-https software-properties-common
@@ -442,11 +442,14 @@ mkdir -p /var/log/areca
 # For now, create a placeholder structure
 mkdir -p /opt/areca/app
 
+# --- Install uv (fast Python package manager) ---
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="/root/.local/bin:$PATH"
+
 # --- Python virtual environment ---
-python3.11 -m venv /opt/areca/venv
+uv venv /opt/areca/venv --python python3.11
 source /opt/areca/venv/bin/activate
-pip install --upgrade pip
-pip install \
+uv pip install \
     fastapi uvicorn gunicorn mangum \
     psycopg2-binary sqlalchemy \
     pandas numpy lightgbm scikit-learn \
