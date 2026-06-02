@@ -1,4 +1,4 @@
-# 🌿 Areca Nut Price Prediction System
+# Areca Nut Price Prediction System
 
 A production-grade cloud-based platform for monitoring Karnataka areca nut market prices and generating ML-powered price forecasts. Designed for farmers, traders, and agri-market analysts.
 
