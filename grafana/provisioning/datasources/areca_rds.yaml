@@ -1,0 +1,35 @@
+# grafana/provisioning/datasources/areca_rds.yaml
+# ================================================
+# Grafana datasource provisioning for the Areca Nut Price System.
+# This file auto-configures the PostgreSQL RDS connection when Grafana starts.
+# Place in: /etc/grafana/provisioning/datasources/
+
+apiVersion: 1
+
+deleteDatasources:
+  - name: areca-rds-postgres
+    orgId: 1
+
+datasources:
+  - name: areca-rds-postgres
+    uid: areca-rds-postgres
+    type: postgres
+    orgId: 1
+    url: "${RDS_HOST}:5432"
+    user: "${RDS_USER}"
+    secureJsonData:
+      password: "${RDS_PASSWORD}"
+    jsonData:
+      database: "${RDS_DB_NAME}"
+      sslmode: "prefer"
+      maxOpenConns: 10
+      maxIdleConns: 5
+      maxIdleConnsAuto: true
+      connMaxLifetime: 14400
+      postgresVersion: 1500        # PostgreSQL 15
+      timescaledb: false
+      tlsAuth: false
+      tlsAuthWithCACert: false
+    isDefault: true
+    editable: false
+    version: 1

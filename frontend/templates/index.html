@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ಅಡಿಕೆ ಬೆಲೆ ಮಾಹಿತಿ | Areca Nut Price Dashboard — Karnataka APMC</title>
+  <meta name="description" content="Real-time areca nut (supari/adike) wholesale prices from Karnataka APMC markets with AI-powered 7-day and 30-day price forecasts for farmers and traders." />
+  <meta name="keywords" content="areca nut price, supari price today, adike bele, Karnataka APMC, Shimoga market price, Chali Gotu Kotte price" />
+  <meta name="author" content="Areca Price Intelligence System" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- ================================================================
+       HEADER
+  ================================================================ -->
+  <header class="header" role="banner">
+    <div class="header__inner">
+      <div class="header__brand">
+        <span class="header__logo" aria-hidden="true">🌿</span>
+        <div>
+          <h1 class="header__title">ಅಡಿಕೆ ಬೆಲೆ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್</h1>
+          <p class="header__subtitle">Areca Nut Price Intelligence · Karnataka APMC · AI Forecasting</p>
+        </div>
+      </div>
+
+      <nav class="header__nav" aria-label="Main navigation">
+        <button class="nav-btn nav-btn--active" id="btn-prices"  onclick="showSection('prices')">📊 Prices</button>
+        <button class="nav-btn" id="btn-forecast" onclick="showSection('forecast')">🤖 AI Forecast</button>
+        <button class="nav-btn" id="btn-grafana"  onclick="showSection('grafana')">📈 Analytics</button>
+      </nav>
+
+      <div class="header__meta" aria-live="polite">
+        <span class="live-badge" aria-label="Data is live">● LIVE</span>
+        <time id="last-updated" datetime="">--:-- IST</time>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================================================================
+       MAIN
+  ================================================================ -->
+  <main class="main" role="main">
+
+    <!-- Alert Banner (dynamic) -->
+    <div id="alert-banner" class="alert-banner" role="alert" aria-live="assertive" hidden></div>
+
+    <!-- ============================================================
+         SECTION 1: CURRENT PRICES
+    ============================================================ -->
+    <section id="section-prices" class="section" aria-labelledby="prices-heading">
+
+      <!-- Summary Stats Row -->
+      <div class="stats-row" aria-label="Price summary statistics">
+        <div class="stat-card stat-card--amber" id="stat-chali">
+          <p class="stat-card__label">Chali · ಚಾಲಿ</p>
+          <p class="stat-card__value" id="chali-price">—</p>
+          <p class="stat-card__unit">₹ / Quintal</p>
+          <div class="stat-card__badge" id="chali-trend">—</div>
+        </div>
+        <div class="stat-card stat-card--green" id="stat-gotu">
+          <p class="stat-card__label">Gotu · ಗೋಟು</p>
+          <p class="stat-card__value" id="gotu-price">—</p>
+          <p class="stat-card__unit">₹ / Quintal</p>
+          <div class="stat-card__badge" id="gotu-trend">—</div>
+        </div>
+        <div class="stat-card stat-card--blue" id="stat-kotte">
+          <p class="stat-card__label">Kotte · ಕೊಟ್ಟೆ</p>
+          <p class="stat-card__value" id="kotte-price">—</p>
+          <p class="stat-card__unit">₹ / Quintal</p>
+          <div class="stat-card__badge" id="kotte-trend">—</div>
+        </div>
+        <div class="stat-card stat-card--slate" id="stat-markets">
+          <p class="stat-card__label">Active Markets</p>
+          <p class="stat-card__value" id="active-markets">—</p>
+          <p class="stat-card__unit">Karnataka APMCs</p>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar" role="search" aria-label="Price filters">
+        <h2 id="prices-heading" class="section__title">Market Prices</h2>
+        <div class="filter-bar__controls">
+          <label class="sr-only" for="filter-variety">Filter by variety</label>
+          <select id="filter-variety" class="filter-select" onchange="loadCurrentPrices()" aria-label="Filter by variety">
+            <option value="">All Varieties</option>
+            <option value="Chali">Chali</option>
+            <option value="Gotu">Gotu</option>
+            <option value="Kotte">Kotte</option>
+            <option value="Rashi">Rashi</option>
+            <option value="Saraku">Saraku</option>
+          </select>
+          <label class="sr-only" for="filter-market">Filter by market</label>
+          <input
+            type="text"
+            id="filter-market"
+            class="filter-input"
+            placeholder="Search market (e.g. Shimoga)"
+            oninput="debounceLoadPrices()"
+            aria-label="Filter by market name"
+          />
+          <button class="btn-refresh" id="btn-refresh-prices" onclick="loadCurrentPrices()" aria-label="Refresh prices">
+            ↻ Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Price Cards Grid -->
+      <div id="price-cards-grid" class="price-grid" role="list" aria-label="Market price cards">
+        <!-- Populated by JavaScript -->
+        <div class="skeleton-card" aria-hidden="true"></div>
+        <div class="skeleton-card" aria-hidden="true"></div>
+        <div class="skeleton-card" aria-hidden="true"></div>
+        <div class="skeleton-card" aria-hidden="true"></div>
+        <div class="skeleton-card" aria-hidden="true"></div>
+        <div class="skeleton-card" aria-hidden="true"></div>
+      </div>
+
+      <!-- No results -->
+      <div id="no-price-data" class="empty-state" hidden>
+        <span class="empty-state__icon">🌾</span>
+        <p>No price data available for today. Please check back after market hours.</p>
+      </div>
+
+      <!-- Historical Chart -->
+      <div class="chart-container">
+        <div class="chart-container__header">
+          <h2 class="chart-container__title">30-Day Price History</h2>
+          <div class="chart-controls">
+            <button class="chart-btn chart-btn--active" id="hist-7d"  onclick="updateHistoryChart(7)"  aria-pressed="false">7D</button>
+            <button class="chart-btn" id="hist-30d"  onclick="updateHistoryChart(30)" aria-pressed="true">30D</button>
+            <button class="chart-btn" id="hist-90d"  onclick="updateHistoryChart(90)" aria-pressed="false">90D</button>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="history-chart" role="img" aria-label="Historical price chart"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         SECTION 2: AI FORECAST
+    ============================================================ -->
+    <section id="section-forecast" class="section" hidden aria-labelledby="forecast-heading">
+
+      <h2 id="forecast-heading" class="section__title">🤖 AI Price Forecast</h2>
+      <p class="section__subtitle">
+        LightGBM machine learning model trained on 2+ years of APMC price history, weather data, and market arrivals.
+      </p>
+
+      <!-- Forecast Cards -->
+      <div class="forecast-row">
+        <div class="forecast-card forecast-card--7d">
+          <div class="forecast-card__horizon">7-Day Outlook</div>
+          <p class="forecast-card__label">Chali Expected Price</p>
+          <p class="forecast-card__price" id="forecast-chali-7d">—</p>
+          <p class="forecast-card__range" id="forecast-chali-7d-range">Confidence: — to —</p>
+          <div class="forecast-card__recommendation" id="rec-chali-7d">—</div>
+        </div>
+        <div class="forecast-card forecast-card--30d">
+          <div class="forecast-card__horizon">30-Day Outlook</div>
+          <p class="forecast-card__label">Chali Expected Price</p>
+          <p class="forecast-card__price" id="forecast-chali-30d">—</p>
+          <p class="forecast-card__range" id="forecast-chali-30d-range">Confidence: — to —</p>
+          <div class="forecast-card__recommendation" id="rec-chali-30d">—</div>
+        </div>
+        <div class="forecast-card forecast-card--gotu">
+          <div class="forecast-card__horizon">7-Day Outlook</div>
+          <p class="forecast-card__label">Gotu Expected Price</p>
+          <p class="forecast-card__price" id="forecast-gotu-7d">—</p>
+          <p class="forecast-card__range" id="forecast-gotu-7d-range">Confidence: — to —</p>
+          <div class="forecast-card__recommendation" id="rec-gotu-7d">—</div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-bar" role="note" aria-label="Recommendation legend">
+        <span class="legend-item legend-item--hold">
+          <span class="legend-dot legend-dot--green"></span>
+          <strong>HOLD</strong> — Price rising or stable. Wait for better prices.
+        </span>
+        <span class="legend-item legend-item--sell">
+          <span class="legend-dot legend-dot--red"></span>
+          <strong>SELL</strong> — Price falling. Liquidate stock before further decline.
+        </span>
+      </div>
+
+      <!-- Forecast Chart -->
+      <div class="chart-container">
+        <div class="chart-container__header">
+          <h3 class="chart-container__title">Forecast vs Historical — Chali (₹/Quintal)</h3>
+          <div class="chart-controls">
+            <button class="chart-btn chart-btn--active" onclick="updateForecastChart('Chali')"  id="fc-chali" aria-pressed="true">Chali</button>
+            <button class="chart-btn" onclick="updateForecastChart('Gotu')"   id="fc-gotu"  aria-pressed="false">Gotu</button>
+            <button class="chart-btn" onclick="updateForecastChart('Kotte')"  id="fc-kotte" aria-pressed="false">Kotte</button>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="forecast-chart" role="img" aria-label="Forecast price chart with confidence bands"></canvas>
+        </div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer" role="note">
+        ⚠️ <strong>Disclaimer:</strong> AI price forecasts are indicative only and based on historical patterns.
+        Market conditions, government policies, and external events can cause significant deviation.
+        Always consult your local APMC or agriculture officer before major selling decisions.
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         SECTION 3: GRAFANA ANALYTICS
+    ============================================================ -->
+    <section id="section-grafana" class="section" hidden aria-labelledby="grafana-heading">
+
+      <h2 id="grafana-heading" class="section__title">📈 Advanced Analytics Dashboard</h2>
+      <p class="section__subtitle">
+        Interactive Grafana dashboards showing historical trends, arrivals, weather correlation, and ML model performance.
+      </p>
+
+      <div class="grafana-embed-wrapper">
+        <iframe
+          id="grafana-iframe"
+          class="grafana-iframe"
+          src=""
+          data-src="http://localhost:3000/d/areca-price-dashboard?orgId=1&kiosk=tv&theme=dark&from=now-90d&to=now"
+          title="Areca Nut Analytics Dashboard — Grafana"
+          frameborder="0"
+          loading="lazy"
+          allowfullscreen
+          aria-label="Grafana analytics dashboard"
+        ></iframe>
+        <div class="grafana-loading" id="grafana-loading">
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Loading analytics dashboard…</p>
+        </div>
+      </div>
+
+      <div class="grafana-links">
+        <a href="http://localhost:3000/d/areca-price-dashboard" target="_blank" rel="noopener" class="btn-link">
+          🔗 Open in Grafana
+        </a>
+        <a href="http://localhost:3000/d/areca-price-dashboard?orgId=1&viewPanel=10" target="_blank" rel="noopener" class="btn-link btn-link--secondary">
+          📊 Price History Panel
+        </a>
+        <a href="http://localhost:3000/d/areca-price-dashboard?orgId=1&viewPanel=20" target="_blank" rel="noopener" class="btn-link btn-link--secondary">
+          🤖 Forecast vs Actuals
+        </a>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer__inner">
+      <p>ಕರ್ನಾಟಕ ಅಡಿಕೆ ಬೆಲೆ ಮಾಹಿತಿ ವ್ಯವಸ್ಥೆ &nbsp;|&nbsp; Karnataka Areca Nut Price Intelligence System</p>
+      <p>Data source: Agmarknet (agmarknet.gov.in) &nbsp;|&nbsp; AI Forecasting: LightGBM v4 &nbsp;|&nbsp; Weather: Open-Meteo</p>
+      <p>For queries, contact your local APMC or Krishi Vigyan Kendra (KVK)</p>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+# ============================================================
+# .gitignore — Areca Nut Price Prediction System
+# ============================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Environment variables (NEVER commit secrets)
+.env
+*.local
+
+# ML Models (large binary files)
+/opt/areca/models/
+models/
+*.pkl
+*.joblib
+*.h5
+*.pt
+
+# Logs
+*.log
+logs/
+/var/log/
+
+# Lambda deployment packages
+*.zip
+lambda_package/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Infrastructure state
+.terraform/
+*.tfstate
+*.tfstate.backup
+terraform.tfvars
+
+# Database migrations
+alembic/versions/__pycache__/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Node (if any frontend tooling)
+node_modules/

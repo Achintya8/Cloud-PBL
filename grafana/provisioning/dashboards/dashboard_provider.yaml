@@ -1,0 +1,16 @@
+# grafana/provisioning/dashboards/dashboard_provider.yaml
+# =========================================================
+# Tells Grafana where to load dashboard JSON files from disk.
+
+apiVersion: 1
+
+providers:
+  - name: areca-price-dashboards
+    orgId: 1
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/dashboards
+      foldersFromFilesStructure: false

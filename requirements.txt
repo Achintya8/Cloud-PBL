@@ -1,0 +1,47 @@
+# ============================================================
+# requirements.txt
+# Areca Nut Price Prediction System — Python Dependencies
+# Pinned for reproducibility. Run: pip install -r requirements.txt
+# ============================================================
+
+# --- Web / API ---
+fastapi==0.111.1
+uvicorn[standard]==0.30.1
+mangum==0.17.0
+httpx==0.27.0
+pydantic==2.7.4
+jinja2==3.1.4
+python-multipart==0.0.9
+starlette==0.37.2
+
+# --- Database ---
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.31
+alembic==1.13.2
+
+# --- ETL / Scraping ---
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.2.2
+urllib3==2.2.2
+
+# --- ML / Data Science ---
+lightgbm==4.4.0
+scikit-learn==1.5.1
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+
+# --- Infrastructure ---
+boto3==1.34.144
+botocore==1.34.144
+
+# --- Utilities ---
+python-dotenv==1.0.1
+pyyaml==6.0.1
+click==8.1.7
+rich==13.7.1
+tenacity==8.4.1
+
+# --- Monitoring ---
+prometheus-client==0.20.0
