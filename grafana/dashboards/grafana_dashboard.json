@@ -44,7 +44,7 @@
       "type": "stat",
       "title": "Chali — Latest Modal Price (₹/Qtl)",
       "description": "Most recently recorded wholesale modal price for Chali variety",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "thresholds"},
@@ -73,7 +73,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT NOW() AS time, AVG(modal_price) AS \"Chali Price\" FROM market_prices mp JOIN varieties v ON v.variety_id = mp.variety_id WHERE v.variety_name = 'Chali' AND mp.record_date = (SELECT MAX(record_date) FROM market_prices)",
           "refId": "A",
           "format": "time_series"
@@ -86,7 +86,7 @@
       "id": 2,
       "type": "stat",
       "title": "Gotu — Latest Modal Price (₹/Qtl)",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "thresholds"},
@@ -112,7 +112,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT NOW() AS time, AVG(modal_price) AS \"Gotu Price\" FROM market_prices mp JOIN varieties v ON v.variety_id = mp.variety_id WHERE v.variety_name = 'Gotu' AND mp.record_date = (SELECT MAX(record_date) FROM market_prices)",
           "refId": "A",
           "format": "time_series"
@@ -125,7 +125,7 @@
       "id": 3,
       "type": "stat",
       "title": "Active Markets Today",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "fixed", "fixedColor": "blue"},
@@ -141,7 +141,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT NOW() AS time, COUNT(DISTINCT market_id) AS \"Active Markets\" FROM market_prices WHERE record_date = (SELECT MAX(record_date) FROM market_prices)",
           "refId": "A",
           "format": "time_series"
@@ -154,7 +154,7 @@
       "id": 4,
       "type": "stat",
       "title": "Total Arrivals Today (Tons)",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "fixed", "fixedColor": "orange"},
@@ -170,7 +170,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT NOW() AS time, COALESCE(SUM(arrivals_tons), 0) AS \"Total Arrivals\" FROM market_prices WHERE record_date = (SELECT MAX(record_date) FROM market_prices)",
           "refId": "A",
           "format": "time_series"
@@ -183,7 +183,7 @@
       "id": 5,
       "type": "stat",
       "title": "7-Day Price Change — Chali (%)",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "thresholds"},
@@ -208,7 +208,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "WITH latest AS (SELECT AVG(modal_price) AS cur FROM market_prices mp JOIN varieties v ON v.variety_id=mp.variety_id WHERE v.variety_name='Chali' AND record_date=(SELECT MAX(record_date) FROM market_prices)), week_ago AS (SELECT AVG(modal_price) AS prev FROM market_prices mp JOIN varieties v ON v.variety_id=mp.variety_id WHERE v.variety_name='Chali' AND record_date=(SELECT MAX(record_date) FROM market_prices)-7) SELECT NOW() AS time, ROUND(((l.cur - w.prev)/NULLIF(w.prev,0)*100)::NUMERIC,2) AS \"7d Change %\" FROM latest l, week_ago w",
           "refId": "A",
           "format": "time_series"
@@ -221,7 +221,7 @@
       "id": 6,
       "type": "stat",
       "title": "Model Val RMSE (Latest Run)",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "thresholds"},
@@ -245,7 +245,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT NOW() AS time, COALESCE(val_rmse, 0) AS \"Model RMSE\" FROM model_training_runs WHERE status='success' ORDER BY completed_at DESC LIMIT 1",
           "refId": "A",
           "format": "time_series"
@@ -259,7 +259,7 @@
       "type": "timeseries",
       "title": "Historical Modal Price — All Varieties (₹/Quintal)",
       "description": "Daily aggregated modal price for each areca nut variety across all Karnataka APMC markets over the selected time range.",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "palette-classic"},
@@ -304,7 +304,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT record_date AS time, AVG(CASE WHEN v.variety_name='Chali'  THEN mp.modal_price END) AS \"Chali\", AVG(CASE WHEN v.variety_name='Gotu'   THEN mp.modal_price END) AS \"Gotu\",  AVG(CASE WHEN v.variety_name='Kotte'  THEN mp.modal_price END) AS \"Kotte\" FROM market_prices mp JOIN varieties v ON v.variety_id = mp.variety_id WHERE mp.record_date BETWEEN $__timeFrom()::date AND $__timeTo()::date GROUP BY record_date ORDER BY record_date",
           "refId": "A",
           "format": "time_series"
@@ -318,7 +318,7 @@
       "type": "timeseries",
       "title": "Price Forecast vs Actuals — Chali (7-Day Horizon)",
       "description": "Compares ML-predicted Chali prices (with 90% confidence band) against recorded actuals. Green shaded area = confidence interval.",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "palette-classic"},
@@ -376,13 +376,13 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT mp.record_date AS time, AVG(mp.modal_price) AS \"Actual Price\" FROM market_prices mp JOIN varieties v ON v.variety_id=mp.variety_id WHERE v.variety_name='Chali' AND mp.record_date BETWEEN $__timeFrom()::date AND $__timeTo()::date GROUP BY mp.record_date ORDER BY mp.record_date",
           "refId": "A",
           "format": "time_series"
         },
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT pp.target_date AS time, AVG(pp.predicted_price) AS \"Predicted Price\", AVG(pp.confidence_lower) AS \"Confidence Lower\", AVG(pp.confidence_upper) AS \"Confidence Upper\" FROM price_predictions pp JOIN varieties v ON v.variety_id=pp.variety_id WHERE v.variety_name='Chali' AND pp.horizon_days=7 AND pp.target_date BETWEEN $__timeFrom()::date AND $__timeTo()::date GROUP BY pp.target_date ORDER BY pp.target_date",
           "refId": "B",
           "format": "time_series"
@@ -396,7 +396,7 @@
       "type": "gauge",
       "title": "30-Day Forecast Confidence — Chali",
       "description": "Model confidence as a ratio of CI width to predicted price. Lower is better.",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "thresholds"},
@@ -422,7 +422,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT NOW() AS time, AVG(((confidence_upper-confidence_lower)/NULLIF(predicted_price,0))*100) AS \"CI Width %\" FROM price_predictions pp JOIN varieties v ON v.variety_id=pp.variety_id WHERE v.variety_name='Chali' AND pp.horizon_days=30 AND pp.prediction_date=(SELECT MAX(prediction_date) FROM price_predictions)",
           "refId": "A",
           "format": "time_series"
@@ -436,7 +436,7 @@
       "type": "timeseries",
       "title": "Daily Market Arrivals (Tons) — Top Markets",
       "description": "Supply volume trend across key areca nut mandis. High arrivals can signal price pressure.",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "palette-classic"},
@@ -459,7 +459,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT mp.record_date AS time, SUM(CASE WHEN m.market_name='Shimoga'         THEN mp.arrivals_tons END) AS \"Shimoga\", SUM(CASE WHEN m.market_name='Sagara'           THEN mp.arrivals_tons END) AS \"Sagara\",  SUM(CASE WHEN m.market_name='Mudigere'         THEN mp.arrivals_tons END) AS \"Mudigere\", SUM(CASE WHEN m.market_name='Chikkamagaluru'   THEN mp.arrivals_tons END) AS \"Chikkamagaluru\" FROM market_prices mp JOIN markets m ON m.market_id=mp.market_id WHERE mp.record_date BETWEEN $__timeFrom()::date AND $__timeTo()::date GROUP BY mp.record_date ORDER BY mp.record_date",
           "refId": "A",
           "format": "time_series"
@@ -473,7 +473,7 @@
       "type": "timeseries",
       "title": "Weather — Rainfall & Humidity (Shimoga Region)",
       "description": "Monsoon rainfall and humidity trends correlate strongly with areca nut yield and price. Heavy pre-harvest rain can inflate prices.",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "palette-classic"},
@@ -510,7 +510,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT w.record_date AS time, AVG(w.rainfall_mm) AS \"Rainfall (mm)\", AVG(w.avg_humidity) AS \"Avg Humidity (%)\" FROM weather_metrics w JOIN markets m ON m.market_id=w.region_id WHERE m.market_name='Shimoga' AND w.record_date BETWEEN $__timeFrom()::date AND $__timeTo()::date GROUP BY w.record_date ORDER BY w.record_date",
           "refId": "A",
           "format": "time_series"
@@ -524,7 +524,7 @@
       "type": "table",
       "title": "Current Market Prices — All Varieties (Latest Trading Day)",
       "description": "Sortable table of latest modal prices across all markets and varieties.",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "thresholds"},
@@ -579,7 +579,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT m.market_name, v.variety_name, mp.min_price, mp.max_price, mp.modal_price, mp.arrivals_tons, mp.source FROM market_prices mp JOIN markets m ON m.market_id=mp.market_id JOIN varieties v ON v.variety_id=mp.variety_id WHERE mp.record_date=(SELECT MAX(record_date) FROM market_prices) ORDER BY mp.modal_price DESC LIMIT 100",
           "refId": "A",
           "format": "table"
@@ -593,7 +593,7 @@
       "type": "timeseries",
       "title": "ML Model Training History — Validation RMSE Over Time",
       "description": "Tracks model accuracy improvements across training runs. Lower RMSE = more accurate forecasts.",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "palette-classic"},
@@ -615,7 +615,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT mtr.completed_at AS time, mtr.val_rmse AS \"Validation RMSE\", v.variety_name AS metric FROM model_training_runs mtr JOIN varieties v ON v.variety_id=mtr.variety_id WHERE mtr.status='success' AND mtr.completed_at BETWEEN $__timeFrom() AND $__timeTo() ORDER BY mtr.completed_at",
           "refId": "A",
           "format": "time_series"
@@ -628,7 +628,7 @@
       "id": 51,
       "type": "barchart",
       "title": "Price Spread by Variety — Min / Modal / Max (Latest Day)",
-      "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+      "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "palette-classic"},
@@ -647,7 +647,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+          "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
           "rawSql": "SELECT v.variety_name AS \"Variety\", AVG(mp.min_price) AS \"Min Price\", AVG(mp.modal_price) AS \"Modal Price\", AVG(mp.max_price) AS \"Max Price\" FROM market_prices mp JOIN varieties v ON v.variety_id=mp.variety_id WHERE mp.record_date=(SELECT MAX(record_date) FROM market_prices) GROUP BY v.variety_name ORDER BY AVG(mp.modal_price) DESC",
           "refId": "A",
           "format": "table"
@@ -665,7 +665,7 @@
     "list": [
       {
         "current": {"selected": false, "text": "All", "value": "$__all"},
-        "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+        "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
         "definition": "SELECT DISTINCT market_name FROM markets WHERE active = TRUE ORDER BY market_name",
         "hide": 0,
         "includeAll": true,
@@ -680,7 +680,7 @@
       },
       {
         "current": {"selected": false, "text": "Chali", "value": "Chali"},
-        "datasource": {"type": "postgres", "uid": "${DS_ARECA_RDS_POSTGRES}"},
+        "datasource": {"type": "postgres", "uid": "areca-rds-postgres"},
         "definition": "SELECT variety_name FROM varieties WHERE active = TRUE ORDER BY variety_id",
         "hide": 0,
         "includeAll": true,

@@ -15,12 +15,12 @@ datasources:
     uid: areca-rds-postgres
     type: postgres
     orgId: 1
-    url: "${RDS_HOST}:5432"
-    user: "${RDS_USER}"
+    url: "host.docker.internal:5434"
+    user: "areca_admin"
     secureJsonData:
-      password: "${RDS_PASSWORD}"
+      password: "areca_local_pass"
     jsonData:
-      database: "${RDS_DB_NAME}"
+      database: "areca_db"
       sslmode: "prefer"
       maxOpenConns: 10
       maxIdleConns: 5

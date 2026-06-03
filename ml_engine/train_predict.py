@@ -107,6 +107,11 @@ class ArecaDataLoader:
         price_df = pd.DataFrame(price_rows)
         price_df["record_date"] = pd.to_datetime(price_df["record_date"])
 
+        # Convert numeric columns to float to avoid Decimal vs float type mismatches
+        for col in ["modal_price", "min_price", "max_price", "arrivals_tons"]:
+            if col in price_df.columns:
+                price_df[col] = pd.to_numeric(price_df[col], errors="coerce")
+
         if market:
             price_df = price_df[price_df["market_name"].str.lower() == market.lower()]
 

@@ -145,11 +145,13 @@ class DatabaseManager:
         params: Optional[Tuple] = None,
         as_dict: bool = True,
     ) -> List[Dict[str, Any]]:
-        """Execute a SELECT query and return all rows as a list of dicts."""
+        """Execute a query and return all rows as a list of dicts if applicable."""
         with self.raw_connection() as conn:
             cursor_factory = psycopg2.extras.RealDictCursor if as_dict else None
             with conn.cursor(cursor_factory=cursor_factory) as cur:
                 cur.execute(query, params)
+                if cur.description is None:
+                    return []
                 return [dict(row) for row in cur.fetchall()]
 
     def bulk_insert(

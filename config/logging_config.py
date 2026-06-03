@@ -82,10 +82,23 @@ class StructuredLogger:
     # ------------------------------------------------------------------ #
 
     def _log(self, level: int, msg: str, *args, **kwargs) -> None:
+        exc_info = kwargs.pop("exc_info", None)
+        stack_info = kwargs.pop("stack_info", None)
+        stacklevel = kwargs.pop("stacklevel", 1)
         extra = kwargs.pop("extra", {})
         extra.update(kwargs)          # absorb structlog-style key=value pairs
-        exc_info = kwargs.pop("exc_info", False) if "exc_info" in extra else False
-        self._inner.log(level, msg, *args, extra=extra, exc_info=exc_info)
+        
+        # Clean extra of any reserved attributes that could conflict in LogRecord
+        for reserved in JSONFormatter.RESERVED_ATTRS:
+            extra.pop(reserved, None)
+            
+        self._inner.log(
+            level, msg, *args,
+            extra=extra,
+            exc_info=exc_info,
+            stack_info=stack_info,
+            stacklevel=stacklevel
+        )
 
     def debug(self, msg: str, *args, **kwargs) -> None:
         self._log(logging.DEBUG, msg, *args, **kwargs)
